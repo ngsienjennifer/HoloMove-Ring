@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Move Ring App</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+  <main class="phone">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">HoloMove Prototype</p>
+        <h1>Move Ring</h1>
+        <p class="subtitle">Detect. Prompt. Move. Achieve.</p>
+      </div>
+
+      <div class="ring-orb">
+        <i data-lucide="circle-dot"></i>
+      </div>
+    </section>
+
+    <section class="connection-card">
+      <div class="connection-left">
+        <span id="connectionDot" class="connection-dot"></span>
+        <div>
+          <h3 id="connectionText">Ring Connected</h3>
+          <p>Haptic + hologram ready</p>
+        </div>
+      </div>
+
+      <button id="connectBtn" class="pill-btn">Disconnect</button>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="home">
+        <i data-lucide="home"></i>
+        Home
+      </button>
+
+      <button class="tab" data-tab="stats">
+        <i data-lucide="bar-chart-3"></i>
+        Stats
+      </button>
+
+      <button class="tab" data-tab="ring">
+        <i data-lucide="circle"></i>
+        Ring
+      </button>
+
+      <button class="tab" data-tab="settings">
+        <i data-lucide="settings"></i>
+        Settings
+      </button>
+    </nav>
+
+    <section id="home" class="tab-page active">
+      <div id="hologramCard" class="hologram-card idle">
+        <div class="hologram-glow"></div>
+
+        <div class="hologram-content">
+          <i id="hologramIcon" data-lucide="sparkles"></i>
+          <h2 id="hologramTitle">Hologram inactive</h2>
+          <p id="hologramText">
+            Start a study session. The ring will prompt you after long sitting.
+          </p>
+        </div>
+      </div>
+
+      <section class="card timer-card">
+        <div class="card-title-row">
+          <h2>Sitting Timer</h2>
+          <span id="timerMode">Ready</span>
+        </div>
+
+        <div id="timerDisplay" class="timer">00:00</div>
+
+        <div class="timer-buttons">
+          <button id="startBtn" class="primary-btn">
+            <i data-lucide="play"></i>
+            Start
+          </button>
+
+          <button id="pauseBtn" class="secondary-btn">
+            <i data-lucide="pause"></i>
+            Pause
+          </button>
+
+          <button id="resetBtn" class="danger-btn">
+            <i data-lucide="rotate-ccw"></i>
+            Reset
+          </button>
+        </div>
+      </section>
+
+      <section class="stats-row">
+        <div class="mini-card">
+          <i data-lucide="footprints"></i>
+          <h3 id="breaksToday">0</h3>
+          <p>Breaks</p>
+        </div>
+
+        <div class="mini-card">
+          <i data-lucide="star"></i>
+          <h3 id="pointsToday">0</h3>
+          <p>Points</p>
+        </div>
+
+        <div class="mini-card">
+          <i data-lucide="flame"></i>
+          <h3 id="streakDays">7</h3>
+          <p>Streak</p>
+        </div>
+      </section>
+
+      <button id="completeGoalBtn" class="complete-btn">
+        <i data-lucide="check-circle-2"></i>
+        Complete Movement Goal
+      </button>
+    </section>
+
+    <section id="stats" class="tab-page">
+      <section class="card">
+        <div class="card-title-row">
+          <h2>Today’s Progress</h2>
+          <span id="progressPercent">35%</span>
+        </div>
+
+        <div class="progress-shell">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+
+        <p class="hint">
+          Progress increases when you complete movement goals after long sitting.
+        </p>
+      </section>
+
+      <section class="grid-2">
+        <div class="card stat-card">
+          <i data-lucide="clock-3"></i>
+          <h3 id="totalSitting">0 min</h3>
+          <p>Total sitting</p>
+        </div>
+
+        <div class="card stat-card">
+          <i data-lucide="trophy"></i>
+          <h3 id="totalPoints">0</h3>
+          <p>Total points</p>
+        </div>
+
+        <div class="card stat-card">
+          <i data-lucide="activity"></i>
+          <h3 id="movementBreaks">0</h3>
+          <p>Movement breaks</p>
+        </div>
+
+        <div class="card stat-card">
+          <i data-lucide="badge-check"></i>
+          <h3>Focus Pro</h3>
+          <p>Current badge</p>
+        </div>
+      </section>
+
+      <section class="card insight-card">
+        <h2>Insight</h2>
+        <p>
+          You tend to sit longest during study sessions. Try setting reminders
+          every 45–60 minutes and using short goals like stretching or walking.
+        </p>
+      </section>
+    </section>
+
+    <section id="ring" class="tab-page">
+      <section class="ring-showcase card">
+        <div class="big-ring">
+          <div class="ring-hole"></div>
+          <span class="ring-light"></span>
+        </div>
+
+        <h2>Move Ring Status</h2>
+        <p id="ringStatusText">
+          Your ring is connected and ready to detect inactivity.
+        </p>
+
+        <div class="battery-box">
+          <div class="battery-info">
+            <span>Battery</span>
+            <strong id="batteryText">82%</strong>
+          </div>
+
+          <div class="battery-track">
+            <div id="batteryFill" class="battery-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>How It Works</h2>
+
+        <div class="steps">
+          <div>
+            <span>1</span>
+            <p>Ring detects prolonged inactivity</p>
+          </div>
+
+          <div>
+            <span>2</span>
+            <p>Gentle vibration prompt</p>
+          </div>
+
+          <div>
+            <span>3</span>
+            <p>Hologram appears from the ring</p>
+          </div>
+
+          <div>
+            <span>4</span>
+            <p>User completes movement goal</p>
+          </div>
+
+          <div>
+            <span>5</span>
+            <p>Projection powers down</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="settings" class="tab-page">
+      <section class="card">
+        <h2>Reminder Settings</h2>
+
+        <label>
+          Reminder after sitting
+          <input id="reminderInput" type="number" min="1" max="120" value="1" />
+          <small>minutes</small>
+        </label>
+
+        <label>
+          Movement goal
+          <select id="goalSelect">
+            <option>Stretch for 2 minutes</option>
+            <option>Walk 100 steps</option>
+            <option>Stand for 3 minutes</option>
+            <option>Hydrate and walk</option>
+            <option>Shoulder roll + posture reset</option>
+          </select>
+        </label>
+
+        <label>
+          Vibration strength
+          <select id="vibrationSelect">
+            <option>Gentle</option>
+            <option>Medium</option>
+            <option>Strong</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Reward System</h2>
+
+        <div class="reward-list">
+          <div>
+            <i data-lucide="gift"></i>
+            <p>Earn points after movement goals</p>
+          </div>
+
+          <div>
+            <i data-lucide="award"></i>
+            <p>Unlock badges and streaks</p>
+          </div>
+
+          <div>
+            <i data-lucide="users"></i>
+            <p>Future idea: compete with friends</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
