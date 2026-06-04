@@ -7,7 +7,7 @@ let breaks = 0;
 let points = 0;              // redeemable wallet points
 let dailyEarned = 0;         // points earned today
 let dailyGoal = 600;         // daily target
-let progress = 0
+let progress = 0;
 let streak = 0;              // starts from 0
 let dailyGoalCompleted = false;
 let ringConnected = true;
@@ -41,6 +41,10 @@ const progressPercent = document.getElementById("progressPercent");
 const dailyGoalText = document.getElementById("dailyGoalText");
 const dailyPointsEarned = document.getElementById("dailyPointsEarned");
 const dailyPointsLeft = document.getElementById("dailyPointsLeft");
+
+const dailyGoalInput = document.getElementById("dailyGoalInput");
+const saveGoalBtn = document.getElementById("saveGoalBtn");
+const resetDemoBtn = document.getElementById("resetDemoBtn");
 
 const connectionText = document.getElementById("connectionText");
 const connectionDot = document.getElementById("connectionDot");
@@ -614,6 +618,57 @@ function loadSavedTheme() {
   }
 }
 
+function saveDailyGoal() {
+  const newGoal = Number(dailyGoalInput.value);
+
+  if (!newGoal || newGoal < 100) {
+    setHologram(
+      "active",
+      "Invalid goal",
+      "Please set a daily goal of at least 100 points.",
+      "alert-circle"
+    );
+    return;
+  }
+
+  dailyGoal = newGoal;
+
+  setHologram(
+    "idle",
+    "Daily goal updated",
+    `Your new daily movement goal is ${dailyGoal} points.`,
+    "target"
+  );
+
+  updateUI();
+}
+
+function resetDemoProgress() {
+  clearInterval(timer);
+  timer = null;
+
+  seconds = 0;
+  breaks = 0;
+  points = 0;
+  dailyEarned = 0;
+  progress = 0;
+  streak = 0;
+  dailyGoalCompleted = false;
+  history = [];
+  unlockedRewards = [];
+
+  timerMode.textContent = "Ready";
+
+  setHologram(
+    "idle",
+    "Demo progress reset",
+    "Points, streak, breaks, rewards, and progress have been reset to 0.",
+    "rotate-ccw"
+  );
+
+  updateUI();
+}
+
 document.querySelectorAll(".tab").forEach((tab) => {
   tab.addEventListener("click", () => {
     document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
@@ -654,6 +709,14 @@ if (themeSelect) {
 
 if (dndBtn) {
   dndBtn.addEventListener("click", activateDnd);
+}
+
+if (saveGoalBtn) {
+  saveGoalBtn.addEventListener("click", saveDailyGoal);
+}
+
+if (resetDemoBtn) {
+  resetDemoBtn.addEventListener("click", resetDemoProgress);
 }
 
 loadSavedTheme();
