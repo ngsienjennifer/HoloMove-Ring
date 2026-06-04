@@ -159,7 +159,7 @@ body {
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   margin-bottom: 16px;
 }
@@ -549,4 +549,304 @@ small {
     border-radius: 0;
     min-height: 100vh;
   }
+}
+
+
+/* ========================= */
+/* FIXED THEME SYSTEM */
+/* ========================= */
+
+html[data-theme="ocean"],
+body[data-theme="ocean"] {
+  --phone: #f6f8fc;
+  --text: #172033;
+  --muted: #6b7280;
+  --card: rgba(255, 255, 255, 0.88);
+  --blue: #4f7cff;
+  --blue-dark: #2548b8;
+  --cyan: #56d7ff;
+  --green: #21c36a;
+  --purple: #8b5cf6;
+}
+
+html[data-theme="mint"],
+body[data-theme="mint"] {
+  --phone: #f0fdf4;
+  --text: #123524;
+  --muted: #4b6356;
+  --card: rgba(240, 253, 244, 0.92);
+  --blue: #22c55e;
+  --blue-dark: #15803d;
+  --cyan: #5eead4;
+  --green: #16a34a;
+  --purple: #14b8a6;
+}
+
+html[data-theme="sakura"],
+body[data-theme="sakura"] {
+  --phone: #fff1f2;
+  --text: #4a102a;
+  --muted: #8b5c6b;
+  --card: rgba(255, 241, 242, 0.92);
+  --blue: #ec4899;
+  --blue-dark: #be185d;
+  --cyan: #f9a8d4;
+  --green: #fb7185;
+  --purple: #d946ef;
+}
+
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  --phone: #111827;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --card: rgba(30, 41, 59, 0.92);
+  --blue: #60a5fa;
+  --blue-dark: #93c5fd;
+  --cyan: #22d3ee;
+  --green: #22c55e;
+  --purple: #a78bfa;
+}
+
+body[data-theme="ocean"] {
+  background:
+    radial-gradient(circle at top left, rgba(79, 124, 255, 0.32), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(86, 215, 255, 0.22), transparent 36%),
+    linear-gradient(135deg, #0b1220, #172033);
+}
+
+body[data-theme="mint"] {
+  background:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.32), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.22), transparent 36%),
+    linear-gradient(135deg, #052e16, #064e3b);
+}
+
+body[data-theme="sakura"] {
+  background:
+    radial-gradient(circle at top left, rgba(236, 72, 153, 0.32), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(249, 168, 212, 0.24), transparent 36%),
+    linear-gradient(135deg, #4a102a, #831843);
+}
+
+body[data-theme="dark"] {
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.2), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.18), transparent 36%),
+    linear-gradient(135deg, #020617, #0f172a);
+}
+
+body[data-theme] .phone {
+  background: var(--phone);
+  color: var(--text);
+}
+
+body[data-theme] .card,
+body[data-theme] .mini-card,
+body[data-theme] .connection-card {
+  background: var(--card);
+  color: var(--text);
+}
+
+body[data-theme] .hero {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.25), transparent 35%),
+    linear-gradient(135deg, var(--blue-dark), var(--blue));
+}
+
+body[data-theme] .timer {
+  color: var(--blue-dark);
+}
+
+body[data-theme] .tab.active {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+}
+
+body[data-theme] .progress-fill,
+body[data-theme] .battery-fill {
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+}
+
+body[data-theme] .complete-btn {
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+}
+
+body[data-theme="dark"] input,
+body[data-theme="dark"] select {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #475569;
+}
+
+body[data-theme="dark"] .hint,
+body[data-theme="dark"] .card p,
+body[data-theme="dark"] .mini-card p {
+  color: #cbd5e1;
+}
+
+/* ========================= */
+/* REWARDS TAB */
+/* ========================= */
+
+.reward-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background:
+    radial-gradient(circle at top right, rgba(250, 204, 21, 0.35), transparent 40%),
+    linear-gradient(135deg, var(--blue), var(--purple)) !important;
+  color: white !important;
+}
+
+.reward-hero h2,
+.reward-hero p {
+  color: white !important;
+}
+
+.eyebrow-dark {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.78);
+}
+
+.reward-coin {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+}
+
+.reward-coin svg {
+  color: #facc15;
+  width: 36px;
+  height: 36px;
+}
+
+.reward-shop {
+  display: grid;
+  gap: 12px;
+}
+
+.reward-item {
+  border: none;
+  border-radius: 20px;
+  padding: 14px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.reward-item svg {
+  width: 28px;
+  height: 28px;
+  color: var(--purple);
+}
+
+.reward-item strong {
+  display: block;
+  font-size: 14px;
+}
+
+.reward-item p {
+  margin: 3px 0 0;
+  font-size: 12px;
+}
+
+.unlocked-list {
+  display: grid;
+  gap: 10px;
+}
+
+.unlocked-item {
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fafc;
+  font-weight: 800;
+}
+
+/* ========================= */
+/* QUICK ACTIONS */
+/* ========================= */
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.quick-action {
+  border: none;
+  border-radius: 18px;
+  padding: 13px 8px;
+  background: #eef2ff;
+  color: var(--blue-dark);
+  font-weight: 900;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+}
+
+.quick-action svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ========================= */
+/* DND / HISTORY / BADGES */
+/* ========================= */
+
+.dnd-active-card {
+  background: linear-gradient(135deg, #312e81, #1e1b4b) !important;
+  color: white !important;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.45);
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.history-item {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+}
+
+.history-item span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badge {
+  padding: 10px 13px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: white;
+}
+
+.badge.locked {
+  background: #e5e7eb;
+  color: #64748b;
 }
