@@ -138,6 +138,26 @@
           Prototype demo: the real ring would use motion sensors to verify that the user completed the hologram movement task.
         </p>
 
+        <section class="card sensor-card">
+          <h2>Auto Activity Tracking</h2>
+          <p class="hint">
+            The ring also tracks normal movement throughout the day. These points are smaller and capped to avoid unfair reward farming.
+          </p>
+        
+          <div class="sensor-status">
+            <span id="activityStatusDot" class="sensor-dot idle"></span>
+            <div>
+              <strong id="activityStatusTitle">Passive tracking active</strong>
+              <p id="activityStatusText">Ring is monitoring daily movement in the background.</p>
+            </div>
+          </div>
+        
+          <button id="simulatePassiveActivityBtn" class="secondary-wide-btn">
+            <i data-lucide="footprints"></i>
+            Demo: Simulate Passive Ring Activity
+          </button>
+        </section>
+
         <div class="sensor-status">
           <span id="sensorStatusDot" class="sensor-dot idle"></span>
           <div>
