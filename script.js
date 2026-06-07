@@ -20,6 +20,10 @@ let dndRemainingSeconds = 0;
 let history = [];
 let unlockedRewards = [];
 
+let movementRequired = false;
+let currentVerifiedGoal = "";
+let currentVerifiedPoints = 0;
+
 const timerDisplay = document.getElementById("timerDisplay");
 const timerMode = document.getElementById("timerMode");
 const hologramCard = document.getElementById("hologramCard");
@@ -67,6 +71,12 @@ const badgeList = document.getElementById("badgeList");
 
 const rewardPointsDisplay = document.getElementById("rewardPointsDisplay");
 const unlockedRewardsBox = document.getElementById("unlockedRewards");
+
+const verifyMovementBtn = document.getElementById("verifyMovementBtn");
+const simulateMovementBtn = document.getElementById("simulateMovementBtn");
+const sensorStatusDot = document.getElementById("sensorStatusDot");
+const sensorStatusTitle = document.getElementById("sensorStatusTitle");
+const sensorStatusText = document.getElementById("sensorStatusText");
 
 function formatTime(totalSeconds) {
   const mins = Math.floor(totalSeconds / 60);
@@ -119,6 +129,29 @@ function updateUI() {
   if (rewardPointsDisplay) {
     rewardPointsDisplay.textContent = `${points} points`;
   }
+
+  if (verifyMovementBtn) {
+  verifyMovementBtn.disabled = !movementRequired;
+  verifyMovementBtn.innerHTML = movementRequired
+    ? `<i data-lucide="radar"></i> Ring Waiting for Movement`
+    : `<i data-lucide="radar"></i> Waiting for Ring Verification`;
+}
+
+if (simulateMovementBtn) {
+  simulateMovementBtn.disabled = !movementRequired;
+}
+
+if (sensorStatusTitle && sensorStatusText && sensorStatusDot) {
+  if (movementRequired) {
+    sensorStatusTitle.textContent = "Movement required";
+    sensorStatusText.textContent = `Ring is checking for: ${currentVerifiedGoal}`;
+    sensorStatusDot.className = "sensor-dot active";
+  } else {
+    sensorStatusTitle.textContent = "No movement required yet";
+    sensorStatusText.textContent = "Start the timer and wait for the ring reminder.";
+    sensorStatusDot.className = "sensor-dot idle";
+  }
+}
 
   updateDndText();
   updateHistory();
@@ -211,13 +244,18 @@ function triggerReminder() {
 
   const goal = goalSelect.value;
 
+  currentVerifiedGoal = goal;
+  currentVerifiedPoints = calculatePoints();
+
   if (dndMode === "exam") {
     timerMode.textContent = "DND active";
+
+    movementRequired = false;
 
     setHologram(
       "idle",
       "Exam Mode active",
-      "Reminder was muted to avoid interrupting your exam. Movement can be logged later.",
+      "Reminder was muted to avoid interrupting your exam. Movement can be completed later.",
       "moon"
     );
 
@@ -226,13 +264,15 @@ function triggerReminder() {
     return;
   }
 
+  movementRequired = true;
+
   if (dndMode === "class") {
     timerMode.textContent = "Silent prompt";
 
     setHologram(
       "active",
       "Silent hologram",
-      `Class Mode: No vibration. Suggested goal: ${goal}`,
+      `Class Mode: No vibration. Ring is waiting to verify: ${goal}`,
       "projector"
     );
 
@@ -247,7 +287,7 @@ function triggerReminder() {
     setHologram(
       "active",
       "Soft reminder",
-      `Focus Mode: Take a light break when ready. Goal: ${goal}`,
+      `Focus Mode: Complete when ready. Ring is waiting to verify: ${goal}`,
       "sparkles"
     );
 
@@ -265,11 +305,11 @@ function triggerReminder() {
   setHologram(
     "active",
     "Time to move!",
-    `You've been sitting for too long. Goal: ${goal}`,
+    `You've been sitting for too long. Hologram task: ${goal}. Points are awarded only after ring verification.`,
     "projector"
   );
 
-  addHistory("Reminder triggered", "Normal Mode");
+  addHistory("Hologram task shown", goal);
   updateUI();
 }
 
@@ -291,33 +331,48 @@ function addMovementPoints(earned) {
     addHistory("Daily goal completed", `Streak: ${streak} day(s)`);
   }
 }
-function completeGoal() {
+function verifyMovementFromRing() {
   if (!ringConnected) {
     setHologram(
       "active",
       "Ring disconnected",
-      "Connect your ring before logging a movement goal.",
+      "Connect your ring before movement can be verified.",
       "wifi-off"
     );
     return;
   }
 
-  const earned = calculatePoints();
+  if (!movementRequired) {
+    setHologram(
+      "idle",
+      "No active movement task",
+      "The ring has not triggered a movement task yet.",
+      "radar"
+    );
+    return;
+  }
+
+  const earned = currentVerifiedPoints;
 
   breaks += 1;
   addMovementPoints(earned);
   seconds = 0;
+  movementRequired = false;
 
-  timerMode.textContent = "Goal done";
+  timerMode.textContent = "Verified";
 
   setHologram(
     "success",
-    "Goal achieved!",
-    `+${earned} points earned. Hologram powers down.`,
+    "Movement verified!",
+    `The ring detected movement for: ${currentVerifiedGoal}. +${earned} points earned.`,
     "badge-check"
   );
 
-  addHistory("Goal completed", goalSelect.value);
+  addHistory("Ring verified movement", `${currentVerifiedGoal} · +${earned} points`);
+
+  currentVerifiedGoal = "";
+  currentVerifiedPoints = 0;
+
   updateUI();
 }
 
@@ -495,64 +550,6 @@ function updateBadges() {
   `;
 }
 
-function logQuickAction(action) {
-  const actionMap = {
-    water: {
-      label: "Water Walk",
-      earned: 30,
-      icon: "glass-water",
-      message: "You walked to hydrate and break up sitting."
-    },
-    stairs: {
-      label: "Took Stairs",
-      earned: 40,
-      icon: "stairs",
-      message: "You chose stairs instead of lift."
-    },
-    stretch: {
-      label: "Quick Stretch",
-      earned: 25,
-      icon: "person-standing",
-      message: "You completed a short stretch break."
-    },
-    walk: {
-      label: "5-min Walk",
-      earned: 60,
-      icon: "footprints",
-      message: "You added a short walk into your routine."
-    },
-    posture: {
-      label: "Posture Reset",
-      earned: 20,
-      icon: "accessibility",
-      message: "You reset your posture and reduced sitting strain."
-    },
-    buddy: {
-      label: "Buddy Break",
-      earned: 70,
-      icon: "users",
-      message: "You moved with a friend. Social movement bonus!"
-    }
-  };
-
-  const selected = actionMap[action];
-
-  if (!selected) return;
-
-  breaks += 1;
-  addMovementPoints(selected.earned);
-
-  setHologram(
-    "success",
-    `${selected.label} logged!`,
-    `${selected.message} +${selected.earned} points earned.`,
-    selected.icon
-  );
-
-  addHistory(selected.label, `+${selected.earned} points`);
-  updateUI();
-}
-
 function redeemReward(cost, rewardName) {
   if (points < cost) {
     setHologram(
@@ -686,14 +683,16 @@ document.querySelectorAll(".tab").forEach((tab) => {
 document.getElementById("startBtn").addEventListener("click", startTimer);
 document.getElementById("pauseBtn").addEventListener("click", pauseTimer);
 document.getElementById("resetBtn").addEventListener("click", resetTimer);
-document.getElementById("completeGoalBtn").addEventListener("click", completeGoal);
-connectBtn.addEventListener("click", toggleConnection);
 
-document.querySelectorAll(".quick-action").forEach(button => {
-  button.addEventListener("click", () => {
-    logQuickAction(button.dataset.action);
-  });
-});
+if (simulateMovementBtn) {
+  simulateMovementBtn.addEventListener("click", verifyMovementFromRing);
+}
+
+if (verifyMovementBtn) {
+  verifyMovementBtn.addEventListener("click", verifyMovementFromRing);
+}
+
+connectBtn.addEventListener("click", toggleConnection);
 
 document.querySelectorAll(".reward-item").forEach(button => {
   button.addEventListener("click", () => {
@@ -722,3 +721,74 @@ if (resetDemoBtn) {
 loadSavedTheme();
 updateUI();
 lucide.createIcons();
+
+/* ========================= */
+/* RING SENSOR SIMULATION */
+/* ========================= */
+
+.sensor-card {
+  margin-top: 16px;
+}
+
+.sensor-status {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #f8fafc;
+  border-radius: 18px;
+  padding: 14px;
+  margin: 14px 0;
+}
+
+.sensor-status strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.sensor-status p {
+  margin: 4px 0 0;
+}
+
+.sensor-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.sensor-dot.idle {
+  background: #94a3b8;
+  box-shadow: 0 0 10px rgba(148, 163, 184, 0.7);
+}
+
+.sensor-dot.active {
+  background: var(--green);
+  box-shadow: 0 0 14px var(--green);
+}
+
+.secondary-wide-btn {
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  padding: 13px 10px;
+  font-weight: 900;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.secondary-wide-btn:disabled,
+.complete-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+body[data-theme="dark"] .sensor-status {
+  background: #1e293b;
+}
