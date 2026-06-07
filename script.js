@@ -148,7 +148,7 @@ function startTimer() {
     setHologram(
       "active",
       "Ring disconnected",
-      "Please connect your Move Ring before starting a session.",
+      "Please connect your Holo Ring before starting a session.",
       "wifi-off"
     );
     return;
@@ -339,7 +339,7 @@ function toggleConnection() {
     setHologram(
       "active",
       "Ring disconnected",
-      "Reconnect the Move Ring to continue monitoring inactivity.",
+      "Reconnect the Holo Ring to continue monitoring inactivity.",
       "wifi-off"
     );
   } else {
