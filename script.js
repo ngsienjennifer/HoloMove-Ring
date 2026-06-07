@@ -6,7 +6,7 @@ let timer = null;
 let breaks = 0;
 let points = 0;
 let dailyEarned = 0;
-let dailyGoal = 600;
+let dailyGoal = 150;
 let progress = 0;
 let streak = 0;
 let dailyGoalCompleted = false;
@@ -21,6 +21,10 @@ let dndRemainingSeconds = 0;
 let movementRequired = false;
 let currentVerifiedGoal = "";
 let currentVerifiedPoints = 0;
+
+let passiveActivityCount = 0;
+let passiveActivityPointsToday = 0;
+let passiveActivityDailyCap = 60;
 
 let history = [];
 let unlockedRewards = [];
@@ -81,6 +85,11 @@ const simulateMovementBtn = document.getElementById("simulateMovementBtn");
 const sensorStatusDot = document.getElementById("sensorStatusDot");
 const sensorStatusTitle = document.getElementById("sensorStatusTitle");
 const sensorStatusText = document.getElementById("sensorStatusText");
+
+const simulatePassiveActivityBtn = document.getElementById("simulatePassiveActivityBtn");
+const activityStatusDot = document.getElementById("activityStatusDot");
+const activityStatusTitle = document.getElementById("activityStatusTitle");
+const activityStatusText = document.getElementById("activityStatusText");
 
 function formatTime(totalSeconds) {
   const mins = Math.floor(totalSeconds / 60);
@@ -156,6 +165,17 @@ function updateUI() {
     sensorStatusDot.className = "sensor-dot idle";
   }
 
+  if (activityStatusTitle && activityStatusText && activityStatusDot) {
+    activityStatusTitle.textContent =
+      passiveActivityCount > 0 ? "Passive activity detected" : "Passive tracking active";
+
+    activityStatusText.textContent =
+      `Passive points today: ${passiveActivityPointsToday}/${passiveActivityDailyCap}`;
+
+    activityStatusDot.className =
+      passiveActivityCount > 0 ? "sensor-dot active" : "sensor-dot idle";
+  }
+
   updateDndText();
   updateHistory();
   updateBadges();
@@ -213,6 +233,7 @@ function pauseTimer() {
 function resetTimer() {
   clearInterval(timer);
   timer = null;
+
   seconds = 0;
   movementRequired = false;
   currentVerifiedGoal = "";
@@ -321,7 +342,6 @@ function calculatePoints() {
     basePoints = 15;
   }
 
-  // DND modes give slightly adjusted points
   if (dndMode === "class") {
     return Math.round(basePoints * 0.8);
   }
@@ -407,6 +427,79 @@ function verifyMovementFromRing() {
   currentVerifiedGoal = "";
   currentVerifiedPoints = 0;
 
+  updateUI();
+}
+
+function simulatePassiveRingActivity() {
+  if (!ringConnected) {
+    setHologram(
+      "active",
+      "Ring disconnected",
+      "Connect your ring before passive activity can be tracked.",
+      "wifi-off"
+    );
+    return;
+  }
+
+  const activityTypes = [
+    {
+      label: "Light movement detected",
+      detail: "Small movement around campus",
+      points: 5,
+      icon: "person-standing"
+    },
+    {
+      label: "Walking detected",
+      detail: "Ring detected walking motion",
+      points: 8,
+      icon: "footprints"
+    },
+    {
+      label: "Active period detected",
+      detail: "Consistent movement detected",
+      points: 12,
+      icon: "activity"
+    }
+  ];
+
+  const selected = activityTypes[Math.floor(Math.random() * activityTypes.length)];
+
+  if (passiveActivityPointsToday >= passiveActivityDailyCap) {
+    setHologram(
+      "idle",
+      "Passive point limit reached",
+      "The ring is still tracking activity, but passive points are capped for today.",
+      "shield-check"
+    );
+
+    addHistory("Passive cap reached", "No extra points awarded");
+    updateUI();
+    return;
+  }
+
+  const remainingCap = passiveActivityDailyCap - passiveActivityPointsToday;
+  const awardedPoints = Math.min(selected.points, remainingCap);
+
+  passiveActivityCount += 1;
+  passiveActivityPointsToday += awardedPoints;
+
+  addMovementPoints(awardedPoints);
+
+  setHologram(
+    "idle",
+    selected.label,
+    `${selected.detail}. +${awardedPoints} passive points earned.`,
+    selected.icon
+  );
+
+  if (activityStatusTitle && activityStatusText && activityStatusDot) {
+    activityStatusTitle.textContent = selected.label;
+    activityStatusText.textContent =
+      `${selected.detail}. Passive points today: ${passiveActivityPointsToday}/${passiveActivityDailyCap}`;
+    activityStatusDot.className = "sensor-dot active";
+  }
+
+  addHistory(selected.label, `+${awardedPoints} passive points`);
   updateUI();
 }
 
@@ -551,7 +644,7 @@ function updateBadges() {
   const firstMoveClass = breaks >= 1 ? "badge" : "badge locked";
   const threeBreaksClass = breaks >= 3 ? "badge" : "badge locked";
   const pointsClass = points >= 500 ? "badge" : "badge locked";
-  const focusClass = dailyEarned >= 300 ? "badge" : "badge locked";
+  const focusClass = dailyEarned >= 75 ? "badge" : "badge locked";
 
   badgeList.innerHTML = `
     <div class="${firstMoveClass}">🌱 First Verified Move</div>
@@ -568,6 +661,8 @@ function updateCurrentBadge() {
     currentBadge.textContent = "Focus Builder";
   } else if (breaks >= 1) {
     currentBadge.textContent = "First Move";
+  } else if (passiveActivityCount >= 1) {
+    currentBadge.textContent = "Active Starter";
   } else {
     currentBadge.textContent = "Starter";
   }
@@ -637,11 +732,11 @@ function loadSavedTheme() {
 function saveDailyGoal() {
   const newGoal = Number(dailyGoalInput.value);
 
-  if (!newGoal || newGoal < 100) {
+  if (!newGoal || newGoal < 50) {
     setHologram(
       "active",
       "Invalid goal",
-      "Please set a daily goal of at least 100 points.",
+      "Please set a daily goal of at least 50 points.",
       "alert-circle"
     );
     return;
@@ -670,9 +765,14 @@ function resetDemoProgress() {
   progress = 0;
   streak = 0;
   dailyGoalCompleted = false;
+
+  passiveActivityCount = 0;
+  passiveActivityPointsToday = 0;
+
   movementRequired = false;
   currentVerifiedGoal = "";
-  currentVerifiedPoints = "";
+  currentVerifiedPoints = 0;
+
   history = [];
   unlockedRewards = [];
 
@@ -681,7 +781,7 @@ function resetDemoProgress() {
   setHologram(
     "idle",
     "Demo progress reset",
-    "Points, streak, verified breaks, rewards, and progress have been reset to 0.",
+    "Points, streak, passive activity, verified breaks, rewards, and progress have been reset to 0.",
     "rotate-ccw"
   );
 
@@ -707,6 +807,10 @@ connectBtn.addEventListener("click", toggleConnection);
 
 verifyMovementBtn.addEventListener("click", verifyMovementFromRing);
 simulateMovementBtn.addEventListener("click", verifyMovementFromRing);
+
+if (simulatePassiveActivityBtn) {
+  simulatePassiveActivityBtn.addEventListener("click", simulatePassiveRingActivity);
+}
 
 document.querySelectorAll(".reward-item").forEach(button => {
   button.addEventListener("click", () => {
