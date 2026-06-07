@@ -303,9 +303,38 @@ function triggerReminder() {
 }
 
 function calculatePoints() {
-  if (dndMode === "class") return 80;
-  if (dndMode === "focus") return 90;
-  return 100;
+  const goal = goalSelect.value;
+
+  let basePoints = 0;
+
+  if (goal === "Stretch for 2 minutes") {
+    basePoints = 20;
+  } else if (goal === "Walk 100 steps") {
+    basePoints = 35;
+  } else if (goal === "Stand for 3 minutes") {
+    basePoints = 15;
+  } else if (goal === "Hydrate and walk") {
+    basePoints = 25;
+  } else if (goal === "Shoulder roll + posture reset") {
+    basePoints = 10;
+  } else {
+    basePoints = 15;
+  }
+
+  // DND modes give slightly adjusted points
+  if (dndMode === "class") {
+    return Math.round(basePoints * 0.8);
+  }
+
+  if (dndMode === "focus") {
+    return Math.round(basePoints * 0.9);
+  }
+
+  if (dndMode === "exam") {
+    return 0;
+  }
+
+  return basePoints;
 }
 
 function addMovementPoints(earned) {
